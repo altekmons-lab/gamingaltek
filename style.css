@@ -1,0 +1,35 @@
+body {
+    background-color: #05050a;
+    color: #00f2ff;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    display: flex;
+}
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background: #0a0a15;
+    border-right: 2px solid #ff007b;
+    padding: 20px;
+}
+.glitch {
+    font-family: 'Orbitron', sans-serif;
+    color: #ff007b;
+    text-shadow: 2px 2px #00f2ff;
+    font-size: 1.5rem;
+}
+nav a {
+    display: block;
+    color: #00f2ff;
+    text-decoration: none;
+    padding: 15px 0;
+    border-bottom: 1px solid #1a1a2e;
+    transition: 0.3s;
+}
+nav a:hover {
+    color: #ff007b;
+    text-shadow: 0 0 10px #ff007b;
+    padding-left: 10px;
+}
+main { flex-grow: 1; padding: 50px; text-align: center; }
+h1 { font-family: 'Orbitron', sans-serif; font-size: 3rem; }
