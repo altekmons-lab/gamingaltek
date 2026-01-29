@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XDR GASTRO - MENÚ GAMER</title>
+    <title>CAFETERIA PEDIDOS ONLINE - XDR</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -11,46 +11,106 @@
         :root {
             --neon-red: #ff003c;
             --neon-blue: #00f0ff;
-            --neon-yellow: #fcee0a;
+            --neon-green: #39ff14;
+            --neon-purple: #bc13fe;
             --bg-dark: #050505;
             --card-bg: #111;
         }
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
             color: #fff;
             font-family: 'Rajdhani', sans-serif;
             margin: 0;
-            padding-bottom: 80px; /* Espacio para el carrito */
+            padding-bottom: 80px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- EFECTO GLITCH BACKGROUND (VANELLOPE STYLE) --- */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: -1;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            animation: scanline 10s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        /* Glitch ocasional en el contenedor principal */
+        .glitch-wrapper {
+            animation: glitch-anim 5s infinite;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            98% { transform: translate(0); filter: none; }
+            98.5% { transform: translate(-2px, 1px); filter: hue-rotate(90deg) blur(1px); }
+            99% { transform: translate(2px, -1px); filter: none; }
+            100% { transform: translate(0); }
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
             text-align: center;
-            color: var(--neon-yellow);
+            color: #fff;
             text-transform: uppercase;
-            text-shadow: 0 0 10px var(--neon-yellow);
-            margin-top: 20px;
-            font-size: 2rem;
+            text-shadow: 2px 2px 0px var(--neon-purple), -2px -2px 0px var(--neon-blue);
+            margin-top: 30px;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
         }
 
-        .subtitle {
+        .brand-sub {
             text-align: center;
+            font-family: 'Orbitron';
+            font-size: 3rem;
+            font-weight: 900;
             color: var(--neon-blue);
+            text-shadow: 0 0 20px var(--neon-blue);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .server-status {
+            text-align: center;
+            font-family: 'Orbitron';
             font-size: 0.9rem;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+            border: 1px solid var(--neon-green);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 255, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .server-status.offline {
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+            text-shadow: 0 0 10px var(--neon-red);
+            background: rgba(255, 0, 0, 0.1);
         }
 
         /* --- GRID DEL MENÚ --- */
         .menu-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
+            gap: 20px;
             padding: 15px;
             max-width: 1200px;
             margin: 0 auto;
@@ -59,424 +119,403 @@
         .card {
             background: var(--card-bg);
             border: 1px solid #333;
-            border-radius: 8px;
+            border-radius: 0px; /* Cuadrado Cyberpunk */
             overflow: hidden;
             position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
-            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+            transition: 0.2s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
 
-        .card:active {
-            transform: scale(0.98);
+        .card:active { transform: scale(0.98); }
+        
+        .card.selected { 
+            border-color: var(--neon-blue); 
+            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 20px rgba(0, 240, 255, 0.2); 
         }
 
-        .card.selected {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
+        /* FOTOS COMPLETAS (CUADRADAS) */
+        .img-container {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Obliga a ser cuadrado perfecto */
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
         }
 
         .card img {
             width: 100%;
-            height: 140px;
-            object-fit: cover;
-            filter: grayscale(20%);
-        }
-
-        .card-info {
-            padding: 10px;
-        }
-
-        .card-title {
-            font-family: 'Orbitron';
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .card-price {
-            color: var(--neon-yellow);
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .badge-qty {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: var(--neon-red);
-            color: white;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            box-shadow: 0 0 10px var(--neon-red);
-            display: none; /* Se oculta si es 0 */
-        }
-
-        /* --- BARRA INFERIOR (CARRITO) --- */
-        .cart-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.95);
-            border-top: 2px solid var(--neon-blue);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-            backdrop-filter: blur(5px);
-            z-index: 100;
-        }
-
-        .cart-total {
-            font-family: 'Orbitron';
-            font-size: 1.5rem;
-            color: var(--neon-blue);
-        }
-
-        .btn-main {
-            background: var(--neon-red);
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            font-family: 'Orbitron';
-            font-weight: bold;
-            font-size: 1rem;
-            clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
-            cursor: pointer;
-            text-transform: uppercase;
+            height: 100%;
+            object-fit: contain; /* Muestra la foto completa sin recortar */
             transition: 0.3s;
         }
 
+        .card:hover img {
+            transform: scale(1.05);
+        }
+
+        .card-info { padding: 10px; border-top: 1px solid #222; }
+        .card-title { font-family: 'Orbitron'; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
+        .card-price { color: var(--neon-green); font-size: 1.2rem; font-weight: bold; }
+
+        .badge-qty {
+            position: absolute; top: 0; right: 0;
+            background: var(--neon-red); color: white;
+            font-weight: bold; padding: 5px 10px;
+            font-size: 0.9rem; z-index: 10;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 20% 100%);
+            display: none;
+        }
+
+        /* --- CARRITO FLOTANTE --- */
+        .cart-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            border-top: 2px solid var(--neon-blue);
+            padding: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-sizing: border-box; z-index: 100;
+            box-shadow: 0 -5px 20px rgba(0, 240, 255, 0.2);
+        }
+
+        .btn-main {
+            background: var(--neon-blue); color: #000; border: none;
+            padding: 12px 30px; font-family: 'Orbitron'; font-weight: 900;
+            font-size: 1rem; cursor: pointer; text-transform: uppercase;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+            transition: 0.2s;
+        }
+
         .btn-main:hover {
-            background: #ff4d73;
-            box-shadow: 0 0 15px var(--neon-red);
+            background: #fff;
+            box-shadow: 0 0 15px #fff;
+        }
+
+        .btn-main:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         /* --- MODAL --- */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 200;
+            justify-content: center; align-items: flex-start;
+            overflow-y: auto; padding-top: 20px; padding-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
-            background: #0a0a0a;
-            border: 1px solid var(--neon-yellow);
-            padding: 25px;
-            width: 90%;
-            max-width: 400px;
+            background: #0a0a0a; border: 1px solid var(--neon-purple);
+            padding: 20px; width: 90%; max-width: 450px;
+            box-shadow: 0 0 30px rgba(188, 19, 254, 0.3);
             position: relative;
         }
 
-        .modal-header {
-            color: var(--neon-yellow);
-            font-family: 'Orbitron';
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.2rem;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
+        .modal-content::before {
+            content: "SYSTEM CHECKOUT";
+            position: absolute; top: -10px; left: 20px;
+            background: #0a0a0a; color: var(--neon-purple);
+            padding: 0 10px; font-family: 'Orbitron'; font-size: 0.8rem;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .section-title {
+            color: var(--neon-blue); font-family: 'Orbitron';
+            border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px;
+            margin-top: 20px;
         }
 
-        label {
-            display: block;
-            color: #888;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
+        /* --- INPUTS --- */
+        input, select, textarea {
+            width: 100%; background: #0f0f0f; border: 1px solid #333;
+            color: white; padding: 12px; font-family: 'Rajdhani'; font-size: 1.1rem;
+            box-sizing: border-box; margin-bottom: 10px;
+            transition: 0.3s;
         }
-
-        input, select {
-            width: 100%;
-            background: #111;
-            border: 1px solid #444;
-            color: white;
-            padding: 10px;
-            font-family: 'Rajdhani';
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        input:focus {
+        input:focus, select:focus {
             border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
             outline: none;
         }
 
-        .payment-info {
-            background: #151515;
-            border-left: 3px solid var(--neon-blue);
-            padding: 10px;
-            margin: 15px 0;
-            font-size: 0.9rem;
-            color: #ddd;
+        .hidden { display: none; }
+
+        /* --- PANTALLA EXITO --- */
+        #success-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 300;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center;
         }
-        
-        .loading {
-            text-align: center; color: #555; margin-top: 50px; font-family: 'Orbitron';
+        .success-text {
+            color: var(--neon-green); font-family: 'Orbitron'; font-size: 2rem;
+            margin-bottom: 10px; text-shadow: 0 0 15px var(--neon-green);
+            animation: pulse 1s infinite alternate;
         }
+        @keyframes pulse { from { text-shadow: 0 0 10px var(--neon-green); } to { text-shadow: 0 0 30px var(--neon-green); } }
 
     </style>
 </head>
 <body>
 
-    <h1>XDR GASTRO</h1>
-    <div class="subtitle">SYSTEMA DE PEDIDOS CYBERPUNK</div>
-
-    <div id="menu-container" class="menu-container">
-        <div class="loading">CONECTANDO AL SERVIDOR...</div>
+    <div class="glitch-wrapper">
+        <h1>CAFETERIA PEDIDOS ONLINE</h1>
+        <div class="brand-sub">XDR</div>
+        
+        <div id="server-status" class="server-status">CONECTANDO A LA MATRIX...</div>
     </div>
 
-    <div class="cart-bar" id="cart-bar">
+    <div id="menu-container" class="menu-container">
+        <div style="text-align:center; width:100%; margin-top:50px;">CARGANDO DATOS...</div>
+    </div>
+
+    <div class="cart-bar">
         <div>
-            <div style="font-size: 0.8rem; color: #888;">TOTAL A PAGAR</div>
-            <div id="total-display" class="cart-total">$0.00</div>
+            <div style="font-size: 0.8rem; color: #888; font-family: 'Orbitron';">TOTAL A PAGAR</div>
+            <div id="total-display" style="font-size:1.5rem; color:var(--neon-blue); font-family:'Orbitron'">$0.00</div>
         </div>
-        <button class="btn-main" onclick="abrirModal()">PAGAR</button>
+        <button id="btn-pagar" class="btn-main" onclick="abrirModal()">PAGAR</button>
     </div>
 
     <div id="modal-checkout" class="modal">
         <div class="modal-content">
-            <div class="modal-header">DATOS DE OPERACIÓN</div>
             
-            <div class="form-group">
-                <label>NOMBRE CLIENTE</label>
-                <input type="text" id="cli_nombre" placeholder="Ej: Juan Pérez">
+            <div class="section-title">1. RESUMEN DE ORDEN</div>
+            <div id="order-list" style="margin-bottom:10px; font-size:0.9rem; color:#aaa;"></div>
+            <div style="text-align:right; font-weight:bold; font-size:1.4rem; color:var(--neon-green)">
+                TOTAL: <span id="modal-total">$0.00</span>
             </div>
 
-            <div class="form-group">
-                <label>WHATSAPP (Obligatorio)</label>
-                <input type="tel" id="cli_telefono" placeholder="Ej: 04121234567">
+            <div class="section-title">2. TUS DATOS</div>
+            <input type="text" id="cli_nombre" placeholder="NOMBRE COMPLETO">
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="cli_cedula" placeholder="C.I.">
+                <input type="tel" id="cli_telefono" placeholder="WHATSAPP (Obligatorio)">
             </div>
 
-            <div class="payment-info">
-                <strong style="color:var(--neon-blue)">DATOS PAGO MÓVIL:</strong><br>
-                BANCO: <span id="pm_banco">VENEZUELA (0102)</span><br>
-                C.I: <span id="pm_cedula">V-12.345.678</span><br>
-                TLF: <span id="pm_telefono">0412-123.45.67</span>
+            <div class="section-title">3. MÉTODO DE ENTREGA</div>
+            <select id="cli_entrega" onchange="toggleDelivery()">
+                <option value="Pickup">RETIRO EN TIENDA (Pickup)</option>
+                <option value="Delivery">DELIVERY (+$1.00)</option>
+            </select>
+
+            <div id="delivery-fields" class="hidden">
+                <input type="text" id="cli_localidad" placeholder="ZONA / LOCALIDAD">
+                <textarea id="cli_direccion" rows="2" placeholder="DIRECCIÓN EXACTA"></textarea>
             </div>
 
-            <div class="form-group">
-                <label>TIPO DE ENTREGA</label>
-                <select id="cli_entrega">
-                    <option value="Pickup">RETIRO EN LOCAL</option>
-                    <option value="Delivery">DELIVERY (+$1.00)</option>
-                </select>
-            </div>
-
-            <button class="btn-main" style="width:100%" onclick="generarTicketYEnviar()">CONFIRMAR Y DESCARGAR TICKET</button>
-            <button onclick="cerrarModal()" style="width:100%; background:transparent; border:none; color:#555; margin-top:10px; cursor:pointer;">CANCELAR</button>
+            <button class="btn-main" style="width:100%; background:var(--neon-green); color:#000; margin-top:20px;" onclick="procesarOrden()">CONFIRMAR ORDEN</button>
+            <button onclick="document.getElementById('modal-checkout').style.display='none'" 
+                    style="width:100%; background:transparent; border:none; color:#666; margin-top:10px; cursor:pointer">
+                CANCELAR / VOLVER
+            </button>
         </div>
+    </div>
+
+    <div id="success-overlay">
+        <div class="success-text">ORDEN EN PROCESO</div>
+        <div style="color:#fff; font-family:'Orbitron'">CONTACTANDO ASESORES VIA WHATSAPP...</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- 1. CONFIGURACIÓN (PON TUS DATOS AQUÍ) ---
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = { databaseURL: "https://xdr-zone-server-default-rtdb.firebaseio.com/" };
-        
-        // DATOS DE TU PAGO MÓVIL PARA EL PDF
-        const DATOS_PAGO = {
-            banco: "BANCO VENEZUELA",
-            cedula: "V-12.345.678",
-            telefono: "0412-1234567"
-        };
-
-        // Inicializar
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const { jsPDF } = window.jspdf;
 
+        // DATOS PAGO MÓVIL
+        const DATOS_PAGO = { banco: "VENEZUELA", cedula: "V-12.345.678", telefono: "0412-1234567" };
+
         let menuData = {};
-        let carrito = {}; // Objeto: { "id_producto": cantidad }
-        let total = 0;
+        let carrito = {};
+        let tiendaAbierta = true;
+
+        // --- 1. MONITOR DE ESTADO DEL SERVIDOR ---
+        onValue(ref(db, 'config/abierto'), (snap) => {
+            tiendaAbierta = snap.val();
+            const statusDiv = document.getElementById('server-status');
+            const btnPagar = document.getElementById('btn-pagar');
+
+            if (tiendaAbierta === true) {
+                statusDiv.innerText = "SERVIDOR EN LINEA";
+                statusDiv.classList.remove('offline');
+                btnPagar.disabled = false;
+                btnPagar.innerText = "PAGAR";
+            } else {
+                statusDiv.innerText = "TIENDA CERRADA POR HOY";
+                statusDiv.classList.add('offline');
+                btnPagar.disabled = true;
+                btnPagar.innerText = "CERRADO";
+            }
+        });
 
         // --- 2. CARGAR MENÚ ---
-        onValue(ref(db, 'menu'), (snapshot) => {
+        onValue(ref(db, 'menu'), (snap) => {
             const container = document.getElementById('menu-container');
             container.innerHTML = "";
-            menuData = snapshot.val() || {};
-
-            if (Object.keys(menuData).length === 0) {
-                container.innerHTML = "<div class='loading'>MENÚ VACÍO</div>";
-                return;
-            }
+            menuData = snap.val() || {};
 
             for (let [id, item] of Object.entries(menuData)) {
-                // Verificar existencia (Si tu backend lo maneja)
                 if (item.existencia === false) continue;
-
-                const div = document.createElement('div');
-                div.className = 'card';
-                div.id = `card-${id}`;
-                div.onclick = () => agregarAlCarrito(id, item.precio);
-
-                const img = item.img || 'https://via.placeholder.com/200x150/000?text=NO+IMG';
                 
-                div.innerHTML = `
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${id}`;
+                card.onclick = () => sumarItem(id);
+                
+                // Contenedor Cuadrado para imagen completa
+                card.innerHTML = `
                     <div class="badge-qty" id="badge-${id}">0</div>
-                    <img src="${img}">
+                    <div class="img-container">
+                        <img src="${item.img || 'https://via.placeholder.com/200?text=NO+IMG'}">
+                    </div>
                     <div class="card-info">
                         <div class="card-title">${item.nombre.toUpperCase()}</div>
                         <div class="card-price">$${item.precio.toFixed(2)}</div>
                     </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(card);
             }
         });
 
-        // --- 3. LÓGICA DE CARRITO ---
-        window.agregarAlCarrito = (id, precio) => {
+        // --- LÓGICA CARRITO ---
+        window.sumarItem = (id) => {
+            if (!tiendaAbierta) return alert("La tienda está cerrada en este momento.");
             if (!carrito[id]) carrito[id] = 0;
             carrito[id]++;
-            
-            actualizarUI(id);
+            updateUI(id);
         };
 
-        // Función para restar (opcional, clic derecho o pulsación larga podría ser)
-        // Por simplicidad, el clic suma.
-
-        function actualizarUI(id) {
-            // Actualizar Badge visual
+        function updateUI(id) {
+            const qty = carrito[id];
             const badge = document.getElementById(`badge-${id}`);
             const card = document.getElementById(`card-${id}`);
             
-            if (carrito[id] > 0) {
+            if (qty > 0) {
                 badge.style.display = 'block';
-                badge.innerText = `x${carrito[id]}`;
+                badge.innerText = `x${qty}`;
                 card.classList.add('selected');
             }
-
-            // Calcular Total
-            total = 0;
-            for (let [itemId, qty] of Object.entries(carrito)) {
-                if (menuData[itemId]) {
-                    total += menuData[itemId].precio * qty;
-                }
-            }
-            document.getElementById('total-display').innerText = `$${total.toFixed(2)}`;
+            calcularTotal();
         }
 
-        // --- 4. MODAL ---
+        function calcularTotal() {
+            let t = 0;
+            for (let [id, q] of Object.entries(carrito)) {
+                if (menuData[id]) t += menuData[id].precio * q;
+            }
+            document.getElementById('total-display').innerText = `$${t.toFixed(2)}`;
+            return t;
+        }
+
+        // --- MODAL ---
         window.abrirModal = () => {
-            if (total === 0) return alert("CARRITO VACÍO: Selecciona items.");
+            if (calcularTotal() === 0) return alert("Selecciona productos primero.");
             
-            // Llenar datos de pago en el HTML visual
-            document.getElementById('pm_banco').innerText = DATOS_PAGO.banco;
-            document.getElementById('pm_cedula').innerText = DATOS_PAGO.cedula;
-            document.getElementById('pm_telefono').innerText = DATOS_PAGO.telefono;
-            
+            const list = document.getElementById('order-list');
+            list.innerHTML = "";
+            for (let [id, q] of Object.entries(carrito)) {
+                if (q > 0) {
+                    const it = menuData[id];
+                    list.innerHTML += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #222; padding:5px 0;">
+                        <span>${q}x ${it.nombre}</span><span>$${(it.precio * q).toFixed(2)}</span>
+                    </div>`;
+                }
+            }
+            document.getElementById('modal-total').innerText = `$${calcularTotal().toFixed(2)}`;
             document.getElementById('modal-checkout').style.display = 'flex';
         };
 
-        window.cerrarModal = () => document.getElementById('modal-checkout').style.display = 'none';
+        window.toggleDelivery = () => {
+            const tipo = document.getElementById('cli_entrega').value;
+            const campos = document.getElementById('delivery-fields');
+            const totalLabel = document.getElementById('modal-total');
+            
+            let t = calcularTotal();
+            if (tipo === 'Delivery') {
+                campos.classList.remove('hidden');
+                t += 1.0; 
+            } else {
+                campos.classList.add('hidden');
+            }
+            totalLabel.innerText = `$${t.toFixed(2)}`;
+        };
 
-        // --- 5. GENERAR PDF Y ENVIAR ---
-        window.generarTicketYEnviar = async () => {
+        // --- PROCESAR ORDEN ---
+        window.procesarOrden = async () => {
             const nombre = document.getElementById('cli_nombre').value;
+            const cedula = document.getElementById('cli_cedula').value;
             const tlf = document.getElementById('cli_telefono').value;
             const entrega = document.getElementById('cli_entrega').value;
+            
+            if (!nombre || !cedula || !tlf) return alert("Faltan datos obligatorios.");
 
-            if (!nombre || !tlf) return alert("FALTAN DATOS: Nombre y WhatsApp requeridos.");
+            let direccion = "Tienda";
+            if (entrega === 'Delivery') {
+                direccion = document.getElementById('cli_direccion').value;
+                if (!direccion) return alert("Escribe la dirección de entrega.");
+            }
 
-            const montoFinal = total + (entrega === "Delivery" ? 1.0 : 0.0);
-            const itemsList = [];
+            document.getElementById('modal-checkout').style.display = 'none';
+            document.getElementById('success-overlay').style.display = 'flex';
 
-            // Preparar datos para PDF y Firebase
-            const doc = new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: [80, 200] // Formato Ticket Largo
-            });
+            const totalFinal = calcularTotal() + (entrega === 'Delivery' ? 1.0 : 0);
+            const itemsStr = [];
+            for (let [id, q] of Object.entries(carrito)) if(q>0) itemsStr.push(`${q}x ${menuData[id].nombre}`);
 
-            // --- DISEÑO DEL PDF (Ticket) ---
+            // GENERAR PDF
+            const doc = new jsPDF({ orientation: "p", unit: "mm", format: [80, 200] });
             doc.setFont("courier", "bold");
-            doc.setFontSize(14);
-            doc.text("XDR GASTRO GAMER", 40, 10, { align: "center" });
-            
-            doc.setFontSize(10);
-            doc.setFont("courier", "normal");
+            doc.setFontSize(14); doc.text("XDR GASTRO TICKET", 40, 10, { align: "center" });
+            doc.setFontSize(9); doc.setFont("courier", "normal");
             doc.text("--------------------------------", 40, 15, { align: "center" });
-            doc.text(`FECHA: ${new Date().toLocaleString()}`, 5, 20);
+            doc.text(`FECHA: ${new Date().toLocaleTimeString()}`, 5, 20);
             doc.text(`CLIENTE: ${nombre}`, 5, 25);
-            doc.text(`TLF: ${tlf}`, 5, 30);
-            doc.text("--------------------------------", 40, 35, { align: "center" });
-
-            let y = 40;
+            doc.text(`CI: ${cedula}`, 5, 30);
+            doc.text(`TLF: ${tlf}`, 5, 35);
+            doc.text(entrega === 'Delivery' ? `ENTREGA: DELIVERY ($1.00)` : `ENTREGA: PICKUP`, 5, 40);
             
-            // Listar Items
-            for (let [id, qty] of Object.entries(carrito)) {
-                const item = menuData[id];
-                if (item) {
-                    const subtotal = item.precio * qty;
-                    doc.text(`${qty} x ${item.nombre.substring(0, 15).toUpperCase()}`, 5, y);
-                    doc.text(`$${subtotal.toFixed(2)}`, 75, y, { align: "right" });
-                    y += 5;
-                    itemsList.push(`${qty}x ${item.nombre}`);
+            let y = 50;
+            doc.text("--------------------------------", 40, y, { align: "center" }); y+=5;
+            for (let [id, q] of Object.entries(carrito)) {
+                if (q > 0) {
+                    const it = menuData[id];
+                    doc.text(`${q} x ${it.nombre.substring(0,15)}`, 5, y);
+                    doc.text(`$${(it.precio*q).toFixed(2)}`, 75, y, {align:"right"});
+                    y+=5;
                 }
             }
+            y+=5; doc.setFontSize(14); doc.text(`TOTAL: $${totalFinal.toFixed(2)}`, 75, y, {align:"right"});
             
-            if (entrega === "Delivery") {
-                doc.text("SERVICIO DELIVERY", 5, y);
-                doc.text("$1.00", 75, y, { align: "right" });
-                y += 5;
-            }
+            y+=10; doc.setFontSize(9);
+            doc.text("PAGO MOVIL:", 5, y); y+=5;
+            doc.text(`${DATOS_PAGO.banco}`, 5, y); y+=5;
+            doc.text(`${DATOS_PAGO.cedula}`, 5, y); y+=5;
+            doc.text(`${DATOS_PAGO.telefono}`, 5, y);
 
-            doc.text("--------------------------------", 40, y, { align: "center" });
-            y += 5;
-            doc.setFontSize(16);
-            doc.text(`TOTAL: $${montoFinal.toFixed(2)}`, 75, y, { align: "right" });
-            
-            y += 10;
-            doc.setFontSize(10);
-            doc.text("DATOS PARA PAGO MOVIL:", 5, y);
-            y += 5;
-            doc.setFontSize(9);
-            doc.text(`BANCO: ${DATOS_PAGO.banco}`, 5, y); y+=4;
-            doc.text(`CI: ${DATOS_PAGO.cedula}`, 5, y); y+=4;
-            doc.text(`TLF: ${DATOS_PAGO.telefono}`, 5, y); y+=8;
-            
-            doc.setFontSize(8);
-            doc.text("Envia este comprobante por WhatsApp", 40, y, { align: "center" });
-
-            // GUARDAR PDF
             doc.save(`Ticket_XDR_${nombre}.pdf`);
 
-            // --- SUBIR A FIREBASE ---
-            const pedido = {
-                nombre_cliente: nombre,
-                telefono: tlf,
-                tipo_entrega: entrega,
-                items: itemsList,
-                monto: montoFinal,
-                estado: "recibido",
-                origen: "WEB",
-                timestamp: Date.now()
-            };
+            // FIREBASE
+            await push(ref(db, 'pedidos'), {
+                cliente: nombre, cedula, telefono: tlf, tipo_entrega: entrega, direccion,
+                items: itemsStr, monto: totalFinal, estado: "recibido", origen: "WEB", timestamp: Date.now()
+            });
 
-            const newOrderRef = push(ref(db, 'pedidos'));
-            await set(newOrderRef, pedido);
-
-            // --- REDIRIGIR A WHATSAPP ---
-            // Nota: No se puede adjuntar el archivo automáticamente por seguridad del navegador.
-            // El usuario debe adjuntarlo manualmente.
-            const mensaje = `Hola XDR! Soy *${nombre}*.%0A%0AHe realizado un pedido de: $${montoFinal.toFixed(2)}%0A%0AAdjunto mi comprobante de pago.`;
-            
+            // WHATSAPP
             setTimeout(() => {
-                window.open(`https://wa.me/58${DATOS_PAGO.telefono.replace(/\D/g,'')}?text=${mensaje}`, '_blank');
+                const msj = `Hola XDR! Soy *${nombre}*.%0AOrden por: $${totalFinal.toFixed(2)}%0AAdjunto PDF.`;
+                window.open(`https://wa.me/58${DATOS_PAGO.telefono.replace(/\D/g,'')}?text=${msj}`, '_blank');
                 location.reload();
-            }, 1000);
+            }, 3000);
         };
     </script>
 </body>
