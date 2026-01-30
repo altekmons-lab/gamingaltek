@@ -147,15 +147,30 @@
         /* --- LISTA DE PEDIDO ESTILO APP --- */
         .order-row {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #222; padding: 8px 0;
+            border-bottom: 1px solid #222; padding: 12px 0;
         }
-        .item-name { flex-grow: 1; font-size: 0.95rem; color: #ddd; }
-        .item-controls { display: flex; align-items: center; gap: 10px; }
+        .item-name { flex-grow: 1; font-size: 0.95rem; color: #ddd; padding-right: 10px; }
+        .item-controls { display: flex; align-items: center; gap: 8px; }
+        
         .btn-qty {
-            background: #222; border: 1px solid #444; color: #fff;
-            width: 25px; height: 25px; cursor: pointer; border-radius: 4px;
+            background: #222; border: 1px solid var(--neon-blue); color: var(--neon-blue);
+            width: 30px; height: 30px; cursor: pointer; border-radius: 4px;
+            font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
         }
-        .btn-delete { color: var(--neon-red); background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+        .btn-qty:active { background: var(--neon-blue); color: #000; }
+        
+        .btn-delete { 
+            color: var(--neon-red); background: none; border: 1px solid #333; 
+            cursor: pointer; font-size: 1.2rem; width: 30px; height: 30px;
+            border-radius: 4px; display: flex; align-items: center; justify-content: center;
+            margin-right: 5px;
+        }
+        .btn-delete:hover { border-color: var(--neon-red); background: rgba(255, 0, 60, 0.1); }
+
+        .qty-display {
+            color: #fff; font-weight: bold; width: 25px; text-align: center; font-family: 'Orbitron';
+        }
 
         /* --- INPUTS --- */
         input, select, textarea {
@@ -312,22 +327,29 @@
             }
         });
 
-        // --- LÓGICA DE CARRITO ---
+        // --- LÓGICA DE CARRITO (SUMAR Y RESTAR) ---
         window.sumarItem = (id) => {
             if (!tiendaAbierta) return alert("La tienda está cerrada.");
             if (!carrito[id]) carrito[id] = 0;
             carrito[id]++;
             updateCardUI(id);
             actualizarTotales();
+            
+            // Si el modal está abierto, refrescamos para ver el cambio instantáneo
+            if(document.getElementById('modal-checkout').style.display === 'flex') {
+                renderModalItems();
+            }
         };
 
         window.restarItem = (id) => {
             if (carrito[id] > 0) {
                 carrito[id]--;
-                if (carrito[id] === 0) delete carrito[id];
+                if (carrito[id] === 0) {
+                    delete carrito[id];
+                }
                 updateCardUI(id);
                 actualizarTotales();
-                renderModalItems(); // Refrescar lista modal si está abierta
+                renderModalItems(); // Refrescar lista modal
             }
         };
 
@@ -387,6 +409,11 @@
             const list = document.getElementById('modal-items-list');
             list.innerHTML = "";
             
+            if (Object.keys(carrito).length === 0) {
+                cerrarModal();
+                return;
+            }
+            
             for (let [id, qty] of Object.entries(carrito)) {
                 const item = menuData[id];
                 if (!item) continue;
@@ -397,16 +424,15 @@
                         <div class="item-controls">
                             <button class="btn-delete" onclick="eliminarItem('${id}')">×</button>
                             <button class="btn-qty" onclick="restarItem('${id}')">-</button>
-                            <span style="color:#fff; font-weight:bold;">${qty}</span>
+                            <span class="qty-display">${qty}</span>
                             <button class="btn-qty" onclick="sumarItem('${id}')">+</button>
                         </div>
-                        <div style="min-width:60px; text-align:right; color:var(--neon-blue); font-size:0.9rem;">
+                        <div style="min-width:60px; text-align:right; color:var(--neon-blue); font-size:0.9rem; font-weight:bold;">
                             $${(item.precio * qty).toFixed(2)}
                         </div>
                     </div>
                 `;
             }
-            if (Object.keys(carrito).length === 0) cerrarModal();
         }
 
         window.toggleDelivery = () => {
